@@ -23,7 +23,7 @@ spec:
       serviceAccountName: traefik-ingress-controller
       containers:
         - name: traefik
-          image: traefik:v2.1
+          image: traefik:v2.2
           args:
             - --log.level=DEBUG
             - --api
@@ -60,19 +60,27 @@ spec:
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: myingressroute
-  namespace: default
-
+  name: ingressroute
 spec:
   entryPoints:
     - web
-
+    - websecure
   routes:
-    - match: PathPrefix(`/bar`)
+    - match: Host(`example.net`) && PathPrefix(`/bar`)
       kind: Rule
+      priority: 12
+      # defining several services is possible and allowed, but for now the servers of
+      # all the services (for a given route) get merged altogether under the same
+      # load-balancing strategy.
       services:
         - name: whoami
           port: 80
+  # use an empty tls object for TLS with Let's Encrypt
+  tls:
+    secretName: supersecret
+    options:
+      name: myTLSOption
+      namespace: default
 ---
 kind: Deployment
 apiVersion: apps/v1
