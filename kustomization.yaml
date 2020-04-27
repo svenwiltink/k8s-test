@@ -1,0 +1,4 @@
+ secretGenerator:
+  - name: transip-api-key
+    files:
+      - transip.key
